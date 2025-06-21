@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SocialNetwork.Application.Interfaces.Repositories;
+using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Persistence.Contexts;
 using SocialNetwork.Persistence.Repositories;
 
@@ -31,8 +32,14 @@ namespace SocialNetwork.Persistence.Extensions
                 .AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>))
                 .AddTransient<IPostRepository, PostRepository>()
                 .AddTransient<IEventRepository, EventRepository>()
-                .AddTransient<ICommentRepository, CommentRepository>();
-
+                .AddTransient<ICommentRepository, CommentRepository>()
+                .AddTransient<IPageRepository, PageRepository>()
+                .AddTransient<IFriendshipRepository, FriendshipRepository>()
+                .AddTransient<IMessageRepository, MessageRepository>()
+                .AddTransient<IUserRepository, UserRepository>()
+                .AddTransient<ISocialLinkRepository, SocialLinkRepository>()
+                .AddTransient<INotifyRepository, NotifyRepository>()
+                .AddTransient<IPrivacyRepository, PrivacyRepository>();
         }
     }
 }

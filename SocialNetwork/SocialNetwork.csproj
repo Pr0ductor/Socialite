@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Controllers\NewFile.txt" />
+    <None Remove="Models\Auth\NewFile.txt" />
     <None Remove="Views\Home\NewFile.txt" />
   </ItemGroup>
 
@@ -17,6 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>

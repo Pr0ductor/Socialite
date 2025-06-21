@@ -1,9 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using SocialNetwork.Domain.Entities;
+using SocialNetwork.Persistence.Configurations;
+
 
 namespace SocialNetwork.Persistence.Contexts
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<Event> Events { get; set; }
@@ -12,7 +17,8 @@ namespace SocialNetwork.Persistence.Contexts
         public DbSet<Privacy> Privacy { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<SocialLink> SocialLinks { get; set; }
-
+        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -28,8 +34,9 @@ namespace SocialNetwork.Persistence.Contexts
             modelBuilder.ApplyConfiguration(new NotifyConfiguration());
             modelBuilder.ApplyConfiguration(new PrivacyConfiguration());
             modelBuilder.ApplyConfiguration(new SocialLinksConfiguration());
-            modelBuilder.ApplyConfiguration(new UsersConfiguration());
             modelBuilder.ApplyConfiguration(new CommentsConfiguration());
+            modelBuilder.ApplyConfiguration(new FriendshipConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageConfiguration());
         }
     }
 }

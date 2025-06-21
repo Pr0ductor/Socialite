@@ -8,10 +8,10 @@ public class Notify : BaseAuditableEntity
 {
     [Key]
     public int UserId { get; set; }
-    public YesNo? SendMessage { get; set; }
-    public YesNo? LikedPhoto { get; set; }
-    public YesNo? SharedPhoto { get; set; }
-    public YesNo? Followed { get; set; }
-    public YesNo? Mentioned { get; set; }
-    public YesNo? SendRequest { get; set; }
+    public bool SendMessage { get; set; }
+    public bool LikedPhoto { get; set; }
+    public bool SharedPhoto { get; set; }
+    public bool Followed { get; set; }
+    public bool Mentioned { get; set; }
+    public bool SendRequest { get; set; }
 }

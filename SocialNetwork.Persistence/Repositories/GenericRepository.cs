@@ -29,8 +29,7 @@ namespace SocialNetwork.Persistence.Repositories
 
         public Task UpdateAsync(T entity)
         {
-            T exist = _dbContext.Set<T>().Find(entity.Id);
-            _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+            _dbContext.Set<T>().Update(entity);
             return Task.CompletedTask;
         }
 

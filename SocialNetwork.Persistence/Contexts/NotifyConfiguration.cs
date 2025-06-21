@@ -16,7 +16,7 @@ public class NotifyConfiguration : IEntityTypeConfiguration<Notify>
     {
         builder.HasData(
 
-            new Notify { UserId = 1, SendMessage = YesNo.Yes, LikedPhoto = YesNo.No, SharedPhoto = YesNo.No, Followed = YesNo.Yes, Mentioned = YesNo.No, SendRequest = YesNo.No }
+            new Notify { UserId = 1, SendMessage = true, LikedPhoto = false, SharedPhoto = false, Followed = true, Mentioned = false, SendRequest = false }
 
         );
     }

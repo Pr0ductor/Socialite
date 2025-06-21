@@ -1,0 +1,436 @@
+@model SocialNetwork.Application.ViewModels.Messages.MessagesViewModel
+@{
+    ViewData["Title"] = "Messages";
+}
+
+@Html.AntiForgeryToken()
+
+<!-- main contents -->
+<main id="site__main" class="2xl:ml-[--w-side] xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
+    <div class="relative overflow-hidden border -m-2.5 dark:border-slate-700">
+        <div class="flex bg-white dark:bg-dark2">
+            <!-- sidebar -->
+            <div class="md:w-[360px] relative border-r dark:border-slate-700">
+                <div id="side-chat" class="top-0 left-0 max-md:fixed max-md:w-5/6 max-md:h-screen bg-white z-50 max-md:shadow max-md:-translate-x-full dark:bg-dark2">
+                    <!-- heading title -->
+                    <div class="p-4 border-b dark:border-slate-700">
+                        <div class="flex mt-2 items-center justify-between">
+                            <h2 class="text-2xl font-bold text-black ml-1 dark:text-white">Чаты</h2>
+                            <!-- right action buttons -->
+                            <div class="flex items-center gap-2.5"></div>
+                        </div>
+
+                        <!-- search -->
+                        <div class="relative mt-4">
+                            <div class="absolute left-3 bottom-1/2 translate-y-1/2 flex">
+                                <ion-icon name="search" class="text-xl"></ion-icon>
+                            </div>
+                            <input type="text" placeholder="Поиск" class="w-full !pl-10 !py-2 !rounded-lg search-input">
+                        </div>
+                    </div>
+
+                    <!-- users list -->
+                    <div class="space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-130px)]">
+                        @foreach (var friend in Model.Friends)
+                        {
+                            <a href="#" class="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery" data-friend-id="@friend.Id">
+                                <div class="relative w-14 h-14 shrink-0">
+                                    <img src="@friend.ImageUrl" alt="@friend.Name" class="object-cover w-full h-full rounded-full">
+                                    @if (friend.IsOnline)
+                                    {
+                                        <div class="w-4 h-4 absolute bottom-0 right-0 bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+                                    }
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <div class="mr-auto text-sm text-black dark:text-white font-medium">@friend.Name</div>
+                                        @if (friend.LastMessageTime.HasValue)
+                                        {
+                                            <div class="text-xs font-light text-gray-500 dark:text-white/70">
+                                                @friend.LastMessageTime.Value.ToString("HH:mm")
+                                            </div>
+                                        }
+                                        @if (friend.UnreadCount > 0)
+                                        {
+                                            <div class="w-2.5 h-2.5 bg-blue-600 rounded-full dark:bg-slate-700"></div>
+                                        }
+                                    </div>
+                                    <div class="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap">
+                                        @if (!string.IsNullOrEmpty(friend.LastMessage))
+                                        {
+                                            @friend.LastMessage
+                                        }
+                                        else
+                                        {
+                                            <span class="text-gray-400">Нет сообщений</span>
+                                        }
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- overly -->
+                <div id="side-chat-overlay" class="bg-slate-100/40 backdrop-blur w-full h-full dark:bg-slate-800/40 z-40 fixed inset-0 max-md:-translate-x-full md:hidden"></div>
+            </div>
+
+            <!-- message center -->
+            <div class="flex-1">
+                <!-- chat heading -->
+                <div class="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
+                    <div class="flex items-center sm:gap-4 gap-2">
+                        <!-- toggle for mobile -->
+                        <button type="button" class="md:hidden" uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full">
+                            <ion-icon name="chevron-back-outline" class="text-2xl -ml-4"></ion-icon>
+                        </button>
+
+                        <div class="relative cursor-pointer max-md:hidden selected-friend hidden">
+                            <img src="" alt="" class="w-8 h-8 rounded-full shadow selected-friend-avatar">
+                            <div class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px selected-friend-status"></div>
+                        </div>
+                        <div class="cursor-pointer selected-friend hidden">
+                            <div class="text-base font-bold selected-friend-name"></div>
+                            <div class="text-xs text-green-500 font-semibold selected-friend-online-status">Онлайн</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- chats bubble -->
+                <div class="w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-195px)]">
+                    <div class="no-chat-selected">
+                        <div class="py-10 text-center text-sm lg:pt-8">
+                            <div class="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center">
+                                <ion-icon name="chatbubbles-outline" class="text-4xl text-gray-500"></ion-icon>
+                            </div>
+                            <div class="mt-8">
+                                <div class="md:text-xl text-base font-medium text-black dark:text-white">Выберите чат</div>
+                                <div class="text-gray-500 text-sm dark:text-white/80">Выберите друга из списка слева, чтобы начать общение</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages hidden space-y-4">
+                        <!-- Здесь будут сообщения -->
+                    </div>
+                </div>
+
+                <!-- sending message area -->
+                <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t dark:border-slate-700 hidden chat-input">
+                    <div class="relative flex-1">
+                        <textarea placeholder="Напишите сообщение" rows="1" class="w-full resize-none bg-secondery rounded-full px-4 p-2 pr-12 message-input dark:text-white"></textarea>
+                        <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 send-message">
+                            <ion-icon name="send" class="text-xl"></ion-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/js/chat.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let connection;
+        let currentFriendId = null;
+        let typingTimer;
+        const currentUserId = '@Model.CurrentUserId';
+
+        function formatTime(date) {
+            return new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function appendMessage(message) {
+            const messagesContainer = document.querySelector('.chat-messages');
+            
+            // Проверяем, не было ли уже добавлено это сообщение
+            if (document.querySelector(`[data-message-id="${message.id}"]`)) {
+                return;
+            }
+
+            const messageHtml = `
+                <div class="flex ${message.isMine ? 'justify-end' : 'justify-start'} items-end gap-3 message ${message.isRead ? 'message-read' : 'message-unread'}" data-message-id="${message.id}">
+                    ${!message.isMine ? `
+                        <div class="w-8 h-8 rounded-full shrink-0">
+                            <img src="${message.senderAvatar}" alt="" class="w-full h-full object-cover rounded-full">
+                        </div>
+                    ` : ''}
+                    <div class="${message.isMine ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-slate-700'} rounded-xl p-3 px-4 max-w-[75%]">
+                        <p class="text-sm">${message.content}</p>
+                        <div class="text-xs mt-1 opacity-75">${formatTime(message.sentAt)}</div>
+                    </div>
+                    ${message.isMine ? `
+                        <div class="w-8 h-8 rounded-full shrink-0">
+                            <img src="${message.senderAvatar}" alt="" class="w-full h-full object-cover rounded-full">
+                        </div>
+                    ` : ''}
+                </div>`;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function loadMessages(friendId) {
+            try {
+                const response = await fetch(`/Messages/GetChatMessages?friendId=${friendId}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки сообщений');
+                }
+                
+                const messages = await response.json();
+                const messagesContainer = document.querySelector('.chat-messages');
+                messagesContainer.innerHTML = '';
+                
+                messages.forEach(message => {
+                    appendMessage(message);
+                });
+
+                // Прокручиваем к последнему сообщению
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch (error) {
+                console.error('Ошибка загрузки сообщений:', error);
+                alert('Не удалось загрузить сообщения. Пожалуйста, попробуйте позже.');
+            }
+        }
+
+        async function updateFriendsList() {
+            try {
+                const response = await fetch('/Messages/GetUserFriends');
+                if (!response.ok) {
+                    throw new Error('Ошибка получения списка друзей');
+                }
+                
+                const friends = await response.json();
+                const friendsList = document.querySelector('.space-y-2');
+                
+                friends.forEach(friend => {
+                    const existingFriend = friendsList.querySelector(`[data-friend-id="${friend.id}"]`);
+                    if (existingFriend) {
+                        // Обновляем информацию о существующем друге
+                        existingFriend.querySelector('.text-sm.text-black').textContent = friend.name;
+                        existingFriend.querySelector('.font-medium.overflow-hidden').textContent = 
+                            friend.lastMessage || 'Нет сообщений';
+                        
+                        // Обновляем статус онлайн
+                        const statusDot = existingFriend.querySelector('.bg-green-500');
+                        if (friend.isOnline && !statusDot) {
+                            const statusContainer = existingFriend.querySelector('.relative.w-14.h-14');
+                            statusContainer.innerHTML += '<div class="w-4 h-4 absolute bottom-0 right-0 bg-green-500 rounded-full border border-white dark:border-slate-800"></div>';
+                        } else if (!friend.isOnline && statusDot) {
+                            statusDot.remove();
+                        }
+
+                        // Обновляем счетчик непрочитанных
+                        const unreadCount = existingFriend.querySelector('.unread-count');
+                        if (friend.unreadCount > 0) {
+                            if (unreadCount) {
+                                unreadCount.textContent = friend.unreadCount;
+                            } else {
+                                existingFriend.querySelector('.flex.items-center.gap-2.mb-1.5')
+                                    .insertAdjacentHTML('beforeend', 
+                                        `<div class="unread-count bg-blue-600 text-white rounded-full px-2 py-1 text-xs">${friend.unreadCount}</div>`);
+                            }
+                        } else if (unreadCount) {
+                            unreadCount.remove();
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка обновления списка друзей:', error);
+            }
+        }
+
+        // Инициализация SignalR
+        async function initializeSignalR() {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .withAutomaticReconnect()
+                .build();
+
+            // Обработчик получения сообщения
+            connection.on("ReceiveMessage", (senderId, receiverId, message) => {
+                if ((senderId === currentUserId && receiverId === currentFriendId) ||
+                    (senderId === currentFriendId && receiverId === currentUserId)) {
+                    appendMessage(message);
+                }
+                // Обновляем список чатов для отображения последнего сообщения
+                updateFriendsList();
+            });
+
+            // Обработчик печатания
+            connection.on("UserTyping", (userId) => {
+                if (userId === currentFriendId) {
+                    showTypingIndicator();
+                }
+            });
+
+            // Обработчик остановки печатания
+            connection.on("UserStoppedTyping", (userId) => {
+                if (userId === currentFriendId) {
+                    hideTypingIndicator();
+                }
+            });
+
+            // Обработчик прочтения сообщений
+            connection.on("MessagesRead", (userId) => {
+                if (userId === currentFriendId) {
+                    markMessagesAsRead();
+                }
+            });
+
+            try {
+                await connection.start();
+                // Добавляем пользователя в его группу SignalR
+                await connection.invoke("JoinChat", currentUserId);
+            } catch (err) {
+                console.error(err);
+                setTimeout(initializeSignalR, 5000);
+            }
+        }
+
+        function showTypingIndicator() {
+            const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.classList.remove('hidden');
+            }
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.classList.add('hidden');
+            }
+        }
+
+        function markMessagesAsRead() {
+            const unreadMessages = document.querySelectorAll('.message-unread');
+            unreadMessages.forEach(message => {
+                message.classList.remove('message-unread');
+                message.classList.add('message-read');
+            });
+        }
+
+        // Делегирование событий для выбора чата
+        document.querySelector('.space-y-2').addEventListener('click', async function(e) {
+            const item = e.target.closest('[data-friend-id]');
+            if (!item) return;
+            e.preventDefault();
+            const friendId = item.dataset.friendId;
+            currentFriendId = friendId;
+
+            // Показываем информацию о выбранном друге
+            document.querySelectorAll('.selected-friend').forEach(el => el.classList.remove('hidden'));
+            
+            const friendName = item.querySelector('.text-black').textContent;
+            const friendAvatar = item.querySelector('img').src;
+            const isOnline = item.querySelector('.bg-green-500') !== null;
+
+            document.querySelector('.selected-friend-name').textContent = friendName;
+            document.querySelector('.selected-friend-avatar').src = friendAvatar;
+            document.querySelector('.selected-friend-status').style.display = isOnline ? 'block' : 'none';
+            document.querySelector('.selected-friend-online-status').textContent = isOnline ? 'Онлайн' : 'Не в сети';
+
+            // Показываем чат и скрываем заглушку
+            document.querySelector('.no-chat-selected').classList.add('hidden');
+            document.querySelector('.chat-messages').classList.remove('hidden');
+            document.querySelector('.chat-input').classList.remove('hidden');
+
+            // Загружаем сообщения
+            await loadMessages(friendId);
+        });
+
+        document.querySelector('.message-input').addEventListener('input', (e) => {
+            if (!currentFriendId) return;
+
+            clearTimeout(typingTimer);
+            connection.invoke("StartTyping", currentUserId, currentFriendId);
+
+            typingTimer = setTimeout(() => {
+                connection.invoke("StopTyping", currentUserId, currentFriendId);
+            }, 1000);
+        });
+
+        async function sendMessage() {
+            if (!currentFriendId) {
+                alert('Пожалуйста, выберите получателя сообщения');
+                return;
+            }
+
+            const input = document.querySelector('.message-input');
+            const content = input.value.trim();
+            
+            if (!content) {
+                alert('Пожалуйста, введите текст сообщения');
+                input.focus();
+                return;
+            }
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            try {
+                const response = await fetch('/Messages/SendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token,
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        receiverId: currentFriendId,
+                        content: content
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                // Получаем отправленное сообщение с сервера и добавляем его в чат
+                const message = await response.json();
+                appendMessage(message);
+
+                // Очищаем поле ввода
+                input.value = '';
+                input.style.height = 'auto';
+                input.focus();
+
+                // Обновляем список чатов для отображения последнего сообщения
+                updateFriendsList();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Не удалось отправить сообщение. Пожалуйста, попробуйте еще раз.');
+            }
+        }
+
+        document.querySelector('.message-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        document.querySelector('.send-message').addEventListener('click', sendMessage);
+
+        const messageInput = document.querySelector('.message-input');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('[data-friend-id]').forEach(item => {
+                const friendName = item.querySelector('.text-black').textContent.toLowerCase();
+                item.style.display = friendName.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Инициализация при загрузке страницы
+        initializeSignalR();
+    });
+    </script>
+} 

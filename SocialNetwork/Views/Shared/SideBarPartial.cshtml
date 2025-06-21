@@ -12,7 +12,7 @@
 
                 <ul>
                     @Html.SidebarLink("Home", "Index", "Feed", "/images/icons/home.png", "feeds")
-                    @Html.SidebarLink("Home", "Messages", "Messages", "/images/icons/message.png", "Messages")
+                    @Html.SidebarLink("Messages", "Index", "Messages", "/images/icons/message.png", "Messages")
                     @Html.SidebarLink("Home", "Event", "Event", "/images/icons/event.png", "event")
                     @Html.SidebarLink("Home", "Pages", "Pages", "/images/icons/page.png", "pages")
                     @Html.SidebarLink("Home", "Groups", "Groups", "/images/icons/group.png", "groups")
@@ -36,6 +36,18 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span> Setting </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Pages" class="nav-link">
+                            <ion-icon name="people-outline" class="text-2xl md hydrated"></ion-icon>
+                            <span> Pages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Messages" asp-action="Index" class="nav-link">
+                            <ion-icon name="chatbubble-outline" class="text-2xl md hydrated"></ion-icon>
+                            <span>Сообщения</span>
                         </a>
                     </li>
                 </ul>

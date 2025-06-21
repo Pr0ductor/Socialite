@@ -1,6 +1,7 @@
 ﻿using SocialNetwork.Domain.Common;
 using SocialNetwork.Domain.Entities.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SocialNetwork.Domain.Entities;
 
@@ -8,6 +9,7 @@ public class User : BaseAuditableEntity
 {
     [Key]
     public int UserId { get; set; }
+    public string? IdentityId { get; set; }
     public string? Name { get; set; }
     public string? Img { get; set; }
     public string? Email { get; set; }

@@ -16,8 +16,8 @@ public class SocialLinksConfiguration : IEntityTypeConfiguration<SocialLink>
             Facebook = "facebook",
             Instagram = "instagram",
             Twitter = "twitter",
-            Youtube = "youtube",
-            Github = "github",
+            YouTube = "youtube",
+            GitHub = "github",
         }
         );
     }
