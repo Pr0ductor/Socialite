@@ -23,36 +23,31 @@ namespace SocialNetwork.Application.Features.Settings.Commands.UpdateSocialLinks
 
         public async Task<bool> Handle(UpdateSocialLinksCommand request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (identityId == null) return false;
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return false;
 
-            var appUser = await _userRepository.GetByIdentityIdAsync(identityId);
-            if (appUser == null) return false;
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return false;
 
-            var socialLink = await _socialLinkRepository.GetByUserIdAsync(appUser.UserId);
+            var socialLink = await _socialLinkRepository.GetByUserIdAsync(user.UserId);
 
             if (socialLink == null)
             {
-                socialLink = new SocialLink { UserId = appUser.UserId };
-                UpdateSocialLinkProperties(socialLink, request);
+                socialLink = new SocialLink { UserId = user.UserId };
+            }
+
+            socialLink.Facebook = request.Facebook;
+            socialLink.Instagram = request.Instagram;
+            socialLink.Twitter = request.Twitter;
+            socialLink.YouTube = request.YouTube;
+            socialLink.GitHub = request.GitHub;
+
+            if (socialLink.Id == 0)
                 await _socialLinkRepository.AddAsync(socialLink);
-            }
             else
-            {
-                UpdateSocialLinkProperties(socialLink, request);
                 await _socialLinkRepository.UpdateAsync(socialLink);
-            }
 
             return true;
-        }
-
-        private void UpdateSocialLinkProperties(SocialLink socialLink, UpdateSocialLinksCommand request)
-        {
-            socialLink.Facebook = request.SocialLinks.Facebook;
-            socialLink.Instagram = request.SocialLinks.Instagram;
-            socialLink.Twitter = request.SocialLinks.Twitter;
-            socialLink.YouTube = request.SocialLinks.YouTube;
-            socialLink.GitHub = request.SocialLinks.GitHub;
         }
     }
 } 

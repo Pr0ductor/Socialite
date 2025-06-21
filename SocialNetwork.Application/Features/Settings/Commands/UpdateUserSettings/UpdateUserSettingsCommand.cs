@@ -5,6 +5,9 @@ namespace SocialNetwork.Application.Features.Settings.Commands.UpdateUserSetting
 {
     public class UpdateUserSettingsCommand : IRequest<bool>
     {
-        public UserSettingsDto UserSettings { get; set; } = new();
+        public string Name { get; set; } = string.Empty;
+        public string Bio { get; set; } = string.Empty;
+        public int Gender { get; set; }
+        public int Relationship { get; set; }
     }
 } 

@@ -23,37 +23,32 @@ namespace SocialNetwork.Application.Features.Settings.Commands.UpdateNotifySetti
 
         public async Task<bool> Handle(UpdateNotifySettingsCommand request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (identityId == null) return false;
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return false;
 
-            var appUser = await _userRepository.GetByIdentityIdAsync(identityId);
-            if (appUser == null) return false;
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return false;
 
-            var notify = await _notifyRepository.GetByUserIdAsync(appUser.UserId);
+            var notify = await _notifyRepository.GetByUserIdAsync(user.UserId);
 
             if (notify == null)
             {
-                notify = new Notify { UserId = appUser.UserId };
-                UpdateNotifyProperties(notify, request);
+                notify = new Notify { UserId = user.UserId };
+            }
+
+            notify.SendMessage = request.SendMessage;
+            notify.LikedPhoto = request.LikedPhoto;
+            notify.SharedPhoto = request.SharedPhoto;
+            notify.Followed = request.Followed;
+            notify.Mentioned = request.Mentioned;
+            notify.SendRequest = request.SendRequest;
+
+            if (notify.Id == 0)
                 await _notifyRepository.AddAsync(notify);
-            }
             else
-            {
-                UpdateNotifyProperties(notify, request);
                 await _notifyRepository.UpdateAsync(notify);
-            }
 
             return true;
-        }
-
-        private void UpdateNotifyProperties(Notify notify, UpdateNotifySettingsCommand request)
-        {
-            notify.SendMessage = request.NotifySettings.SendMessage;
-            notify.LikedPhoto = request.NotifySettings.LikedPhoto;
-            notify.SharedPhoto = request.NotifySettings.SharedPhoto;
-            notify.Followed = request.NotifySettings.Followed;
-            notify.Mentioned = request.NotifySettings.Mentioned;
-            notify.SendRequest = request.NotifySettings.SendRequest;
         }
     }
 } 

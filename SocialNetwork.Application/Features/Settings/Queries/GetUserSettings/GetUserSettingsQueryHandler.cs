@@ -21,20 +21,13 @@ namespace SocialNetwork.Application.Features.Settings.Queries.GetUserSettings
 
         public async Task<UserSettingsDto> Handle(GetUserSettingsQuery request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (identityId == null)
-            {
-                // Or throw an exception, depending on expected behavior
-                return new UserSettingsDto(); 
-            }
-            var user = await _userRepository.GetByIdentityIdAsync(identityId);
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return new UserSettingsDto();
+            
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return new UserSettingsDto();
 
-            if (user == null)
-            {
-                return new UserSettingsDto();
-            }
-
-            return new UserSettingsDto()
+            return new UserSettingsDto
             {
                 Name = user.Name,
                 Bio = user.Bio,

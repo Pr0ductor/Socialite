@@ -14,7 +14,6 @@ namespace SocialNetwork.Application.Features.Settings.Queries.GetSocialLinks
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
 
-
         public GetSocialLinksQueryHandler(ISocialLinkRepository socialLinkRepository, ICurrentUserService currentUserService, IUserRepository userRepository)
         {
             _socialLinkRepository = socialLinkRepository;
@@ -24,18 +23,14 @@ namespace SocialNetwork.Application.Features.Settings.Queries.GetSocialLinks
 
         public async Task<SocialLinksDto> Handle(GetSocialLinksQuery request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (identityId == null) return new SocialLinksDto();
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return new SocialLinksDto();
 
-            var appUser = await _userRepository.GetByIdentityIdAsync(identityId);
-            if (appUser == null) return new SocialLinksDto();
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return new SocialLinksDto();
 
-            var socialLink = await _socialLinkRepository.GetByUserIdAsync(appUser.UserId);
-
-            if (socialLink == null)
-            {
-                return new SocialLinksDto();
-            }
+            var socialLink = await _socialLinkRepository.GetByUserIdAsync(user.UserId);
+            if (socialLink == null) return new SocialLinksDto();
 
             return new SocialLinksDto
             {

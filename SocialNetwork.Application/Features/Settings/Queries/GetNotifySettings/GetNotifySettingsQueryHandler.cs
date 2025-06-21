@@ -23,27 +23,23 @@ namespace SocialNetwork.Application.Features.Settings.Queries.GetNotifySettings
 
         public async Task<NotifySettingsDto> Handle(GetNotifySettingsQuery request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (identityId == null) return new NotifySettingsDto();
-            
-            var appUser = await _userRepository.GetByIdentityIdAsync(identityId);
-            if (appUser == null) return new NotifySettingsDto();
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return new NotifySettingsDto();
 
-            var notifySettings = await _notifyRepository.GetByUserIdAsync(appUser.UserId);
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return new NotifySettingsDto();
 
-            if (notifySettings == null)
-            {
-                return new NotifySettingsDto();
-            }
+            var notify = await _notifyRepository.GetByUserIdAsync(user.UserId);
+            if (notify == null) return new NotifySettingsDto();
 
             return new NotifySettingsDto
             {
-                SendMessage = notifySettings.SendMessage,
-                LikedPhoto = notifySettings.LikedPhoto,
-                SharedPhoto = notifySettings.SharedPhoto,
-                Followed = notifySettings.Followed,
-                Mentioned = notifySettings.Mentioned,
-                SendRequest = notifySettings.SendRequest
+                SendMessage = notify.SendMessage,
+                LikedPhoto = notify.LikedPhoto,
+                SharedPhoto = notify.SharedPhoto,
+                Followed = notify.Followed,
+                Mentioned = notify.Mentioned,
+                SendRequest = notify.SendRequest
             };
         }
     }

@@ -2,6 +2,7 @@ using MediatR;
 using SocialNetwork.Application.Interfaces.Repositories;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Entities;
+using SocialNetwork.Domain.Entities.Enums;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,37 +24,32 @@ namespace SocialNetwork.Application.Features.Settings.Commands.UpdatePrivacySett
 
         public async Task<bool> Handle(UpdatePrivacySettingsCommand request, CancellationToken cancellationToken)
         {
-            var identityId = _currentUserService.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (identityId == null) return false;
+            var userId = _currentUserService.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return false;
 
-            var appUser = await _userRepository.GetByIdentityIdAsync(identityId);
-            if (appUser == null) return false;
+            var user = await _userRepository.GetByIdentityIdAsync(userId);
+            if (user == null) return false;
 
-            var privacy = await _privacyRepository.GetByUserIdAsync(appUser.UserId);
+            var privacy = await _privacyRepository.GetByUserIdAsync(user.UserId);
 
             if (privacy == null)
             {
-                privacy = new Privacy { UserId = appUser.UserId };
-                UpdatePrivacyProperties(privacy, request);
+                privacy = new Privacy { UserId = user.UserId };
+            }
+
+            privacy.FollowMe = (Who)request.FollowMe;
+            privacy.MessageMe = (Who)request.MessageMe;
+            privacy.Activities = (YesNo)request.Activities;
+            privacy.Status = (Status)request.Status;
+            privacy.MyTags = (Who)request.MyTags;
+            privacy.SearchEngine = (YesNo)request.SearchEngine;
+
+            if (privacy.Id == 0)
                 await _privacyRepository.AddAsync(privacy);
-            }
             else
-            {
-                UpdatePrivacyProperties(privacy, request);
                 await _privacyRepository.UpdateAsync(privacy);
-            }
 
             return true;
-        }
-
-        private void UpdatePrivacyProperties(Privacy privacy, UpdatePrivacySettingsCommand request)
-        {
-            privacy.FollowMe = request.PrivacySettings.FollowMe;
-            privacy.MessageMe = request.PrivacySettings.MessageMe;
-            privacy.Activities = request.PrivacySettings.Activities;
-            privacy.Status = request.PrivacySettings.Status;
-            privacy.MyTags = request.PrivacySettings.MyTags;
-            privacy.SearchEngine = request.PrivacySettings.SearchEngine;
         }
     }
 } 

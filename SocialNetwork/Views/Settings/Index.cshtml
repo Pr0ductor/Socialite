@@ -1,4 +1,4 @@
-﻿@model SocialNetwork.Models.Settings.SettingsMasterViewModel
+@model SocialNetwork.Models.Settings.SettingsMasterViewModel
 @using SocialNetwork.Domain.Entities.Enums
 @{
     ViewData["Title"] = "Settings";
@@ -74,7 +74,7 @@
 
                 <!-- tab user basic info -->
                 <div>
-                    <form asp-action="UpdateProfile" asp-controller="Home" method="post" class="space-y-6">
+                    <form asp-action="UpdateProfile" asp-controller="Settings" method="post" class="space-y-6">
                         @Html.AntiForgeryToken()
                         @if (TempData["SuccessMessage"] != null)
                         {
@@ -146,7 +146,7 @@
 
                 <!-- tab socialinks -->
                 <div>
-                    <form asp-action="UpdateSocialLinks" asp-controller="Home" method="post" class="space-y-6">
+                    <form asp-action="UpdateSocialLinks" asp-controller="Settings" method="post" class="space-y-6">
                         @Html.AntiForgeryToken()
                         <div class="max-w-md mx-auto">
 
@@ -215,7 +215,7 @@
 
                 <!-- tab notify -->
                 <div>
-                    <form asp-action="UpdateNotifySettings" asp-controller="Home" method="post" class="space-y-6">
+                    <form asp-action="UpdateNotifySettings" asp-controller="Settings" method="post" class="space-y-6">
                         @Html.AntiForgeryToken()
                         <div>
 
@@ -281,7 +281,7 @@
 
                 <!-- tab privacy -->
                 <div>
-                    <form asp-action="UpdatePrivacySettings" asp-controller="Home" method="post" class="space-y-6">
+                    <form asp-action="UpdatePrivacySettings" asp-controller="Settings" method="post" class="space-y-6">
                         @Html.AntiForgeryToken()
                         <div>
 
@@ -348,4 +348,4 @@
 
     </div>
 
-</main>
+</main> 

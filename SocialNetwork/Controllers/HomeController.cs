@@ -9,15 +9,6 @@ using SocialNetwork.Application.Features.Posts.Query.GetByUserPageId;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Models;
 using SocialNetwork.Models.Home;
-using SocialNetwork.Application.Features.Settings.Commands.UpdateUserSettings;
-using SocialNetwork.Application.Features.Settings.Queries.GetUserSettings;
-using SocialNetwork.Application.Features.Settings.Queries.GetPrivacySettings;
-using SocialNetwork.Application.Features.Settings.Queries.GetNotifySettings;
-using SocialNetwork.Application.Features.Settings.Queries.GetSocialLinks;
-using SocialNetwork.Application.Features.Settings.Commands.UpdatePrivacySettings;
-using SocialNetwork.Application.Features.Settings.Commands.UpdateNotifySettings;
-using SocialNetwork.Application.Features.Settings.Commands.UpdateSocialLinks;
-using SocialNetwork.Models.Settings;
 using System.Threading.Tasks;
 
 namespace SocialNetwork.Controllers
@@ -70,54 +61,6 @@ namespace SocialNetwork.Controllers
         public IActionResult Market() { return View(); }
         public IActionResult Event2() { return View(); }
         public IActionResult Groups2() { return View(); }
-        [HttpGet]
-        public async Task<IActionResult> Settings()
-        {
-            var viewModel = new SettingsMasterViewModel
-            {
-                UserSettings = await _mediator.Send(new GetUserSettingsQuery()),
-                SocialLinks = await _mediator.Send(new GetSocialLinksQuery()),
-                NotifySettings = await _mediator.Send(new GetNotifySettingsQuery()),
-                PrivacySettings = await _mediator.Send(new GetPrivacySettingsQuery())
-            };
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(SettingsMasterViewModel model)
-        {
-            await _mediator.Send(new UpdateUserSettingsCommand { UserSettings = model.UserSettings });
-            TempData["SuccessMessage"] = "Профиль успешно обновлен.";
-            return RedirectToAction("Settings");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateSocialLinks(SettingsMasterViewModel model)
-        {
-            await _mediator.Send(new UpdateSocialLinksCommand { SocialLinks = model.SocialLinks });
-            TempData["SuccessMessage"] = "Социальные сети успешно обновлены.";
-            return RedirectToAction("Settings");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateNotifySettings(SettingsMasterViewModel model)
-        {
-            await _mediator.Send(new UpdateNotifySettingsCommand { NotifySettings = model.NotifySettings });
-            TempData["SuccessMessage"] = "Настройки уведомлений успешно обновлены.";
-            return RedirectToAction("Settings");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdatePrivacySettings(SettingsMasterViewModel model)
-        {
-            await _mediator.Send(new UpdatePrivacySettingsCommand { PrivacySettings = model.PrivacySettings });
-            TempData["SuccessMessage"] = "Настройки приватности успешно обновлены.";
-            return RedirectToAction("Settings");
-        }
 
         [Authorize]
         [HttpPost]
@@ -196,16 +139,6 @@ namespace SocialNetwork.Controllers
 
             return RedirectToAction(nameof(Pages));
         }
-
-        //private void GetErrorMessage(string action) => action.ToLower() switch
-        //{
-        //    //"send" => "Не удалось отправить заявку в друзья. Возможно, заявка уже существует.",
-        //    //"accept" => "Не удалось принять заявку в друзья. Возможно, заявка была отменена.",
-        //    //"reject" => "Не удалось отклонить заявку в друзья.",
-        //    //"remove" => "Не удалось удалить из друзей.",
-        //    //_ => "Не удалось выполнить действие. Пожалуйста, попробуйте снова."
-           
-        //};
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

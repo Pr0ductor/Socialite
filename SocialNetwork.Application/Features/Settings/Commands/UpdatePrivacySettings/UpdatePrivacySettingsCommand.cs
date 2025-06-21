@@ -1,10 +1,14 @@
 using MediatR;
-using SocialNetwork.Application.Features.Settings.Dtos;
 
 namespace SocialNetwork.Application.Features.Settings.Commands.UpdatePrivacySettings
 {
     public class UpdatePrivacySettingsCommand : IRequest<bool>
     {
-        public PrivacySettingsDto PrivacySettings { get; set; } = new();
+        public int FollowMe { get; set; }
+        public int MessageMe { get; set; }
+        public int Activities { get; set; }
+        public int Status { get; set; }
+        public int MyTags { get; set; }
+        public int SearchEngine { get; set; }
     }
 } 
